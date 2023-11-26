@@ -15,18 +15,6 @@ from pytorch3d.loss.point_mesh_distance import _DEFAULT_MIN_TRIANGLE_AREA
 from pytorch3d._C import point_face_dist_forward
 
 def construct_pointcloud(points_to_be_projected, device='cpu') -> Pointclouds:
-    """Simulate geometryConstraints function in Maya
-
-    Args:
-        vtxs (iterable): vertices of the mesh
-        faces (iterable): faces of the mesh
-        points_to_be_projected (iterable): points that will be projected onto the mesh constructed by `vtxs` and `faces`
-        device (str, optional): _description_. Defaults to 'cpu'.
-
-    Returns:
-        _type_: _description_
-    """
-
     if isinstance(points_to_be_projected, torch.Tensor):
         points_to_be_projected = points_to_be_projected.detach().to(device)
     elif isinstance(points_to_be_projected, numpy.ndarray):
@@ -37,7 +25,6 @@ def construct_pointcloud(points_to_be_projected, device='cpu') -> Pointclouds:
     return Pointclouds([points_to_be_projected])
 
 def construct_mesh(vtxs, faces, device='cpu')->Meshes:
-
     if isinstance(vtxs, torch.Tensor):
         vtxs = vtxs.detach().to(device)
     elif isinstance(vtxs, numpy.ndarray):
