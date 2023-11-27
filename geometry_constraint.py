@@ -16,21 +16,21 @@ from pytorch3d._C import point_face_dist_forward
 
 def construct_pointcloud(points_to_be_projected, device='cpu') -> Pointclouds:
     if isinstance(points_to_be_projected, torch.Tensor):
-        points_to_be_projected = points_to_be_projected.detach().to(device)
+        points_to_be_projected = points_to_be_projected.detach().float().to(device)
     elif isinstance(points_to_be_projected, numpy.ndarray):
-        points_to_be_projected = torch.from_numpy(points_to_be_projected).to(device)
+        points_to_be_projected = torch.from_numpy(points_to_be_projected).float().to(device)
     else:
-        points_to_be_projected = torch.tensor(points_to_be_projected, device=device)
+        points_to_be_projected = torch.tensor(points_to_be_projected, dtype=torch.float, device=device)
 
     return Pointclouds([points_to_be_projected])
 
 def construct_mesh(vtxs, faces, device='cpu')->Meshes:
     if isinstance(vtxs, torch.Tensor):
-        vtxs = vtxs.detach().to(device)
+        vtxs = vtxs.detach().float().to(device)
     elif isinstance(vtxs, numpy.ndarray):
-        vtxs = torch.from_numpy(vtxs).to(device)
+        vtxs = torch.from_numpy(vtxs).float().to(device)
     else:
-        vtxs = torch.tensor(vtxs, device=device)
+        vtxs = torch.tensor(vtxs, dtype=torch.float, device=device)
 
     if isinstance(faces, torch.Tensor):
         faces = faces.detach().to(device)
@@ -41,7 +41,7 @@ def construct_mesh(vtxs, faces, device='cpu')->Meshes:
 
     return Meshes([vtxs], [faces])
 
-def geometry_constraint(point_cloud: Pointclouds, mesh_batch: Meshes) -> List[torch.Tensor]:
+def geometry_constraint(point_cloud: Pointclouds, mesh_batch: Meshes) -> torch.Tensor:
     """Simulate geometryConstraints function in Maya
 
     Args:
@@ -64,7 +64,7 @@ def geometry_constraint(point_cloud: Pointclouds, mesh_batch: Meshes) -> List[to
     for point, tri_vtxs in zip(points, triangle_vertices_closest_to_points):
         projections.append(point_projection_on_triangle(point, tri_vtxs))
 
-    return projections
+    return torch.stack(projections, dim=1)
 
 
 def point_to_face_distance(
